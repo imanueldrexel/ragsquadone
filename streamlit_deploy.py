@@ -8,7 +8,7 @@ from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.utilities import SQLDatabase
 
-from config_env import embedding_endpoint, llm_endpoint, azure_openai_version,api_key
+from config_env import *
 from prompt_vault import response_prompt, query_routing_prompt, result_nl2sql_prompt, nl2sql_prompt, privacy_handling_message
 from langchain.globals import set_verbose
 
@@ -35,21 +35,20 @@ user_cif = st.sidebar.text_input("Enter CIF:"   )
 
 # Initialize models and vector store
 embedding_model = AzureOpenAIEmbeddings(azure_endpoint=embedding_endpoint, api_key=api_key)
-# vector_store = InMemoryVectorStore(embedding_model).load('VS-final', embedding_model)
-vector_store = InMemoryVectorStore(embedding_model).load('vector_store_doc_int_2', embedding_model)
+vector_store = InMemoryVectorStore(embedding_model).load(vector_store_name, embedding_model)
 db = SQLDatabase.from_uri("sqlite:///rag_base.db")
 
 
-open_ai_llm = AzureChatOpenAI(
+low_temp_llm = AzureChatOpenAI(
     openai_api_version=azure_openai_version,
     azure_endpoint=llm_endpoint,
-    temperature=0.3,
+    temperature=low_temp_param,
     api_key=api_key
 )
-high_temp_llm = AzureChatOpenAI(temperature=0.7, 
-                                model="gpt-4o-mini  ",
+high_temp_llm = AzureChatOpenAI(temperature=high_temp_param, 
                                 openai_api_version=azure_openai_version,
-                                azure_endpoint=llm_endpoint
+                                azure_endpoint=llm_endpoint,
+                                api_key=api_key
                                )
 
 def decisioning_chain():
@@ -58,7 +57,7 @@ def decisioning_chain():
             "question": RunnablePassthrough(),
         }
         | query_routing_prompt
-        | open_ai_llm
+        | low_temp_llm
     )
     return chain
 
@@ -92,7 +91,7 @@ def chain_prompt_1():
             "chat_history": itemgetter("chat_history")
         }
         | nl2sql_prompt
-        | open_ai_llm
+        | low_temp_llm
         | 
         {
             "sql_result": lambda x: privacy_handling(x),
@@ -109,10 +108,13 @@ def chain_prompt_2(vectorstore):
         {
             "question": itemgetter("question"),
             "chat_history": itemgetter("chat_history"),
-            "context": lambda x: vectorstore.similarity_search(x["question"], k=5, similarity_threshold = 0.65, alpha = 0.7),
+            "context": lambda x: vectorstore.similarity_search(x["question"], 
+                                                               k=similarity_search_k, 
+                                                               similarity_threshold = similarity_search_threshold, 
+                                                               alpha = similarity_search_alpha),
         }
         | response_prompt
-        | open_ai_llm
+        | low_temp_llm
     )
     return chain
 
