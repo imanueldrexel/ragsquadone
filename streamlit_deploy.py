@@ -1,5 +1,6 @@
 from operator import itemgetter
 import streamlit as st
+import re
 from ast import literal_eval
 
 from langchain_core.vectorstores import InMemoryVectorStore
@@ -34,8 +35,8 @@ user_cif = st.sidebar.text_input("Enter CIF:"   )
 
 # Initialize models and vector store
 embedding_model = AzureOpenAIEmbeddings(azure_endpoint=embedding_endpoint, api_key=api_key)
-vector_store = InMemoryVectorStore(embedding_model).load('VS-final', embedding_model)
-# vector_store = InMemoryVectorStore(embedding_model).load('vector_store_doc_int_2', embedding_model)
+# vector_store = InMemoryVectorStore(embedding_model).load('VS-final', embedding_model)
+vector_store = InMemoryVectorStore(embedding_model).load('vector_store_doc_int_2', embedding_model)
 db = SQLDatabase.from_uri("sqlite:///rag_base.db")
 
 
@@ -63,17 +64,24 @@ def decisioning_chain():
 
 def chain_prompt_1():
     def privacy_handling(sql_result):
+        result = ""
         if sql_result.content == "PRIVACY ALERT":
             return privacy_handling_message
         else:
             try:
                 query = sql_result.content.replace("`",'').replace("sql","").strip()
-                print(query)
+                query = re.sub(r'^.*?(SELECT)', r'\1', query, flags=re.IGNORECASE)
+                query = query.strip()
+                print("query: -->", query)
                 result = db.run(query)
-                if result:
+                print("result: -->", result)
+                if len(result)>0:
                     result = literal_eval(result)
+                
                 return result
-            except BaseException:
+            
+            except BaseException as e:
+                print(e)
                 return ""
 
     nl2sql_chain = (

@@ -43,11 +43,11 @@ Table: informasi_kartu_kredit --> Menunjukkan status terakhir dari kartu kredit 
 Columns: cif: int -> identifier seseorang di bank mandiri
          nama_lengkap: string
          nama_ibu_kandung: string
-         nomor_hp: bigint
+         nomor_hp: real
          tanggal_lahir: string
          nik: string -> identifier seseorang, berdasarkan national id number
-         nomor_rekening: string
-         nomor_kartu_kredit: string
+         nomor_rekening: real
+         nomor_kartu_kredit: real
          status_kartu_kredit: string
          limit_kartu_kredit: bigint
          tanggal_jatuh_tempo -> tanggal jatuh tempo setiap bulan
@@ -55,7 +55,7 @@ Columns: cif: int -> identifier seseorang di bank mandiri
          tagihan_jatuh_tempo -> tagihan yang telah jatuh tempo
 
 Table: transaksi_kartu_kredit --> Berisi informasi mengenai transaksi suatu kartu kredit, untuk semua periode
-Columns: nomor_kartu_kredit: primary_key
+Columns: nomor_kartu_kredit: real
          tanggal_transaksi
          jam
          tanggal_pembukuan
@@ -65,15 +65,15 @@ Columns: nomor_kartu_kredit: primary_key
          status_code
                                                  
 Table: saldo_livin --> Berisi informasi mengenai data nasabah dan saldo mengendapnya untuk setiap rekeningnya
-Columns: nomor_rekening: primary_key
+Columns: nomor_rekening: real
          nama
          nama_ibu_kandung
          tanggal_lahir
-         nomor_hp
+         nomor_hp: real
          ending_balance
                   
 Table: transaksi_livin --> Berisi informasi mengenai setiap data transaksi nasabah untuk setiap rekeningnya
-Columns: nomor_rekening: primary_key
+Columns: nomor_rekening: real
          nama
          nama_ibu_kandung
          tanggal_transaksi
@@ -103,8 +103,6 @@ Pertanyaan pengguna: "Berapa total tagihan kartu kredit saya yang terakhir?"
 Jawaban dari SQL Database: 1000000
 Response: Hi {nama_nasabah}, tagihan terakhirmu adalah sebesar Rp. 1.000.000,00.
 
-
-Sekarang, jelaskan hal berikut:                                                        
 Jawaban dari SQL Database: {sql_result}
 Pertanyaan pengguna: {question}
 Response: 
