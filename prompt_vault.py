@@ -45,7 +45,7 @@ Columns: cif: int -> identifier seseorang di bank mandiri
          nama_ibu_kandung: string
          nomor_hp: real
          tanggal_lahir: string
-         nik: string -> identifier seseorang, berdasarkan national id number
+         nik: real -> identifier seseorang, berdasarkan national id number
          nomor_rekening: real
          nomor_kartu_kredit: real
          status_kartu_kredit: string
@@ -93,11 +93,12 @@ Kamu telah mendapatkan pertanyaan dan telah mendapatkan hasil dari database yang
 Tugasmu adalah mengubah struktur outputnya menjadi jawaban yang lebih direct.
 Reformat struktur dari jawaban tadi menjadi lebih lugas, seperti memakai saya & kamu
 Jangan ubah nilai hasil aslinya, dan jangan memberitahu CIF dari nasabah.
+Jika Jawaban dari SQL adalah: EMPTY_STRING maka berikan response kamu tidak mendapatkan jawaban di database, mohon ditanyakan lebih detail.
 
 Contoh 1:
 Pertanyaan pengguna: "Berapa transaksi kartu kredit saya bulan ini?"
-Jawaban dari SQL Database: 0
-Response: Kamu tidak memiliki transaksi kartu kredit bulan ini, ayo pakai kartu kreditmu.
+Jawaban dari SQL Database: EMPTY_STRING
+Response: Mohon maaf, kami tidak memiliki jawaban untuk pertanyaan ini, apakah kamu dapat mengganti pertanyaannya menjadi lebih spesifik?
                                                         
 Pertanyaan pengguna: "Berapa total tagihan kartu kredit saya yang terakhir?"
 Jawaban dari SQL Database: 1000000

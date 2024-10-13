@@ -74,14 +74,12 @@ def chain_prompt_1():
                 print("query: -->", query)
                 result = db.run(query)
                 print("result: -->", result)
-                if len(result)>0:
-                    result = literal_eval(result)
-                
+
                 return result
             
             except BaseException as e:
                 print(e)
-                return ""
+                return "EMPTY_STRING"
 
     nl2sql_chain = (
         {
